@@ -22,6 +22,28 @@ var comment = "";
 // This function allows you to update your page in real-time when the firebase database changes.
 database.ref().on("value", function(snapshot) {
     console.log(snapshot.val());
+
+  // If Firebase has a highPrice and highBidder stored (first case)
+  if (snapshot.child("name").exists()) {
+
+    // Set the variables to the stored values in firebase.
+    name = snapshot.val().name;
+    console.log(name);
+
+    // Print the data to the console.
+    // console.log(highBidder);
+    // console.log(highPrice);
+  }
+
+  // Else Firebase doesn't have anything so use the initial local values.
+  else {
+    database.ref().update({
+        name: name,
+        email: email,
+        age: age,
+        comment: comment,
+    });
+    }
 });
 
 // This function handles events where the name button is clicked
@@ -35,41 +57,49 @@ $("#submit").on("click", function(event) {
     email = $("#email-input").val().trim();
     age = $("#age-input").val().trim();
     comment = $("#comment-input").val().trim();
-    
-    console.log(name);
 
-    // var newtopic = $("#name-input").val().trim();
     if (name == ""){
-        // var temp = typeof(newtopic);
-        console.log("Empty String");
+        console.log("Empty Name");
+    } else if (email == "") {
+        console.log("Empty Email");
+    } else if (age== "") {
+        console.log("Empty Age");
+    } else if (comment == "") {
+        console.log("Empty Comment");
     } else {
-        console.log(name);
-        // topics.push(newtopic);
+        console.log("All Fields Present");
     }
-    // The renderButtons function is called, rendering the list of gif buttons
-    // renderButtons();
+
+    // Save the new post in Firebase
+    database.ref().push({
+        name: name,
+        email: email,
+        age: age,
+        comment: comment,
+      });
+  
 });  
 
-  function writeNewPost(uid, username, picture, title, body) {
-    // A post entry.
-    var postData = {
-      author: username,
-      uid: uid,
-      body: body,
-      title: title,
-      starCount: 0,
-      authorPic: picture
-    };
+//   function writeNewPost(uid, username, picture, title, body) {
+//     // A post entry.
+//     var postData = {
+//       author: username,
+//       uid: uid,
+//       body: body,
+//       title: title,
+//       starCount: 0,
+//       authorPic: picture
+//     };
   
-    // Get a key for a new Post.
-    var newPostKey = firebase.database().ref().child('posts').push().key;
+//     // Get a key for a new Post.
+//     var newPostKey = firebase.database().ref().child('posts').push().key;
   
-    // Write the new post's data simultaneously in the posts list and the user's post list.
-    var updates = {};
-    updates['/posts/' + newPostKey] = postData;
-    updates['/user-posts/' + uid + '/' + newPostKey] = postData;
+//     // Write the new post's data simultaneously in the posts list and the user's post list.
+//     var updates = {};
+//     updates['/posts/' + newPostKey] = postData;
+//     updates['/user-posts/' + uid + '/' + newPostKey] = postData;
   
-    return firebase.database().ref().update(updates);
-  }
+//     return firebase.database().ref().update(updates);
+//   }
 
-  console.log(writeNewPost(1, "Max", "pic", "title", "body"));
+//   console.log(writeNewPost(1, "Max", "pic", "title", "body"));
